@@ -1,5 +1,18 @@
 /* this prevents the "no file selected" text from showing up
    which is misleading if the metric has a set of images */
-#img-add {
-    color:white;
+#select-image {
+    color: rgb(24, 33, 61);
+}
+
+.dbview, .uploader {
+    color: #eee;
+    background: rgb(24, 33, 61);
+    margin: 25px;
+    padding: 5px;
+}
+
+.imagelist {
+    min-height:20px;
+    margin-top:10px;
+    margin-bottom:5px;
 }

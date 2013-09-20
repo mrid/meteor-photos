@@ -1,5 +1,6 @@
 <head>
   <title>phototest</title>
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
 </head>
 
 <body>
@@ -9,16 +10,21 @@
 </body>
 
 <template name="uploader">
-  <input id="img-add" type="file" accept="image/*">
-  <div>
-    {{#isolate}}
-    {{#each images}}
-    <img width="200" src="{{url}}" alt="thumbnail">
-    {{/each}}
-    {{/isolate}}
+  <div class="uploader">
+    <input id="select-image" type="file" accept="image/*">
+    <div class="imagelist">
+      {{#each thumbs}}
+      <img width="200" src="{{url}}" alt="thumbnail">
+      {{/each}}
+    </div>
+    <button id="btn-send" class="pure-button">Send Batch</button>
   </div>
-  <button>Send Batch</button>
 </template>
 
 <template name="dbview">
+  <div class="dbview">
+    0 images
+    <div id="img-gallery" class="imagelist">
+    </div>
+  </div>
 </template>
