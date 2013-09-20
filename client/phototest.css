@@ -1,0 +1,5 @@
+/* this prevents the "no file selected" text from showing up
+   which is misleading if the metric has a set of images */
+#img-add {
+    color:white;
+}

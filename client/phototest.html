@@ -1,0 +1,24 @@
+<head>
+  <title>phototest</title>
+</head>
+
+<body>
+  {{> uploader}}
+  <hr>
+  {{> dbview}}
+</body>
+
+<template name="uploader">
+  <input id="img-add" type="file" accept="image/*">
+  <div>
+    {{#isolate}}
+    {{#each images}}
+    <img width="200" src="{{url}}" alt="thumbnail">
+    {{/each}}
+    {{/isolate}}
+  </div>
+  <button>Send Batch</button>
+</template>
+
+<template name="dbview">
+</template>
