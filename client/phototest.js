@@ -54,11 +54,9 @@ Template.dbview.events({
         console.error(err);
         return;
       }
+      console.info('Downloaded  ', result);
       var urls = [];
-      result.forEach(function(buffer) {
-        console.info('ArrayBuffer has ' + buffer.byteLength + ' bytes.');
-        var blob = new Blob([buffer], {type: 'image/jpeg'});
-        console.info('Blob has ' + blob.size + ' bytes.');
+      result.forEach(function(blob) {
         urls.push(URL.createObjectURL(blob));
       });
       Session.set('gallery-urls', urls);
@@ -81,17 +79,6 @@ var showThumbs = function(blobs) {
 };
 
 var loadBuffers = function(blobs) {
-  var buffers = [];
-  var numImages = blobs.length;
-  for (var index = 0; index < numImages; index++) {
-    var bufferReader = new FileReader();
-    bufferReader.onloadend = function(fileReaderEvt) {
-      buffers.push(fileReaderEvt.target.result);
-      if (buffers.length == numImages) {
-        var newval = Session.get('buffers').concat(buffers);
-        Session.set('buffers', newval);
-      }        
-    };
-    bufferReader.readAsArrayBuffer(blobs[index]);
-  }
+  var newval = Session.get('buffers').concat(blobs);
+  Session.set('buffers', newval);
 };
