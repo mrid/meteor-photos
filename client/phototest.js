@@ -1,3 +1,4 @@
+
 Session.setDefault('urls', []);
 Session.setDefault('buffers', []);
 
@@ -16,10 +17,36 @@ Template.uploader.events({
     loadBuffers(files);
   },
   'click #btn-send': function() {
-    console.info('todo');
+    Meteor.call('upload', Session.get('buffers'));
     Session.set('urls', []);
     Session.set('buffers', []);
   }
+});
+
+Template.dbview.events({
+  'click #btn-clear': function() {
+    Meteor.call('clear', function(err, result) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      $('#img-gallery').html('');
+    });
+  },
+  'click #btn-refresh': function() {
+    Meteor.call('download', function(err, result) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      $('#img-gallery').html('');
+      result.forEach(function(buffer) {
+        var blob = new Blob([buffer], {type: "image/jpeg"});
+        var url = URL.createObjectURL(blob);
+        $('#img-gallery').append('<img src="' + url + '">');
+      });
+    });
+  },
 });
 
 var showThumbs = function(blobs) {
