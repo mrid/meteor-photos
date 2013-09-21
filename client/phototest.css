@@ -4,7 +4,7 @@
     color: rgb(24, 33, 61);
 }
 
-.dbview, .uploader {
+.dbview, .uploader, .status {
     color: #eee;
     background: rgb(24, 33, 61);
     margin: 25px;

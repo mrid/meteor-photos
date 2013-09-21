@@ -1,10 +1,17 @@
 
-Session.setDefault('urls', []);
+var $log = null;
+
+Session.setDefault('thumb-urls', []);
+Session.setDefault('gallery-urls', []);
 Session.setDefault('buffers', []);
+
+Template.dbview.rendered = function() {
+  $log = $('#log');
+};
 
 Template.uploader.thumbs = function() {
   var retval = [];
-  Session.get('urls').forEach(function(url) {
+  Session.get('thumb-urls').forEach(function(url) {
     retval.push({url: url});
   });
   return retval;
@@ -18,10 +25,18 @@ Template.uploader.events({
   },
   'click #btn-send': function() {
     Meteor.call('upload', Session.get('buffers'));
-    Session.set('urls', []);
+    Session.set('thumb-urls', []);
     Session.set('buffers', []);
   }
 });
+
+Template.dbview.images = function() {
+  var retval = [];
+  Session.get('gallery-urls').forEach(function(url) {
+    retval.push({url: url});
+  });
+  return retval;
+};
 
 Template.dbview.events({
   'click #btn-clear': function() {
@@ -30,7 +45,7 @@ Template.dbview.events({
         console.error(err);
         return;
       }
-      $('#img-gallery').html('');
+      Session.set('gallery-urls', []);
     });
   },
   'click #btn-refresh': function() {
@@ -39,12 +54,14 @@ Template.dbview.events({
         console.error(err);
         return;
       }
-      $('#img-gallery').html('');
+      var urls = [];
       result.forEach(function(buffer) {
-        var blob = new Blob([buffer], {type: "image/jpeg"});
-        var url = URL.createObjectURL(blob);
-        $('#img-gallery').append('<img src="' + url + '">');
+        console.info('ArrayBuffer has ' + buffer.byteLength + ' bytes.');
+        var blob = new Blob([buffer], {type: 'image/jpeg'});
+        console.info('Blob has ' + blob.size + ' bytes.');
+        urls.push(URL.createObjectURL(blob));
       });
+      Session.set('gallery-urls', urls);
     });
   },
 });
@@ -53,17 +70,14 @@ var showThumbs = function(blobs) {
   var urls = [];
   var numImages = blobs.length;
   for (var index = 0; index < numImages; index++) {
-    var urlReader = new FileReader();
-    urlReader.onloadend = function(fileReaderEvt) {
-      urls.push(fileReaderEvt.target.result);
-      if (urls.length == numImages) {
-        var newval = Session.get('urls').concat(urls);
-        Session.set('urls', newval);
-        $('#img-add').val('');
-      }
-    };
-    urlReader.readAsDataURL(blobs[index]);
+    var blob = blobs[index];
+    console.info('good:', blob);
+    $log.append('Reading blob with ' + blob.size + ' bytes\n');
+    urls.push(URL.createObjectURL(blob));
   }
+  var newval = Session.get('thumb-urls').concat(urls);
+  Session.set('thumb-urls', newval);
+  $('#img-add').val('');
 };
 
 var loadBuffers = function(blobs) {

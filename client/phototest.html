@@ -7,6 +7,8 @@
   {{> uploader}}
   <hr>
   {{> dbview}}
+  <hr>
+  {{> status}}
 </body>
 
 <template name="uploader">
@@ -25,7 +27,16 @@
   <div class="dbview">
     <button id="btn-refresh" class="pure-button">Refresh</button>
     <button id="btn-clear" class="pure-button">Clear</button>
-    <div id="img-gallery" class="imagelist">
+    <div class="imagelist">
+      {{#each images}}
+      <img width="200" src="{{url}}" alt="thumbnail">
+      {{/each}}
     </div>
+  </div>
+</template>
+
+<template name="status">
+  <div class="status">
+    <pre id="log"></pre>
   </div>
 </template>
