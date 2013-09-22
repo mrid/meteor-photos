@@ -1,9 +1,12 @@
+Meteor.userId = function() { return 'dummy'; };
+
+Images = new CollectionFS('images');
 
 var $log = null;
+var SessionBlobs = [];
 
 Session.setDefault('thumb-urls', []);
 Session.setDefault('gallery-urls', []);
-Session.setDefault('blobs', []);
 
 Template.dbview.rendered = function() {
   $log = $('#log');
@@ -24,17 +27,10 @@ Template.uploader.events({
     loadBlobs(files);
   },
   'click #btn-send': function() {
-    var blobs = Session.get('blobs');
-
-    // mona begin
-    var id = Meteor.uuid();
-    var url = document.location.origin + '/upload/' + id;
-    console.info(url, blobs);
-    $.post(url, blobs[0]);
-    // mona end
-
+    var blobs = SessionBlobs;
+    Images.storeFiles(blobs);
     Session.set('thumb-urls', []);
-    Session.set('blobs', []);
+    SessionBlobs = [];
   }
 });
 
@@ -57,18 +53,17 @@ Template.dbview.events({
     });
   },
   'click #btn-refresh': function() {
-    Meteor.call('download', function(err, result) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      var urls = [];
-      result.forEach(function(blob) {
-        console.info('Blob has ' + blob.size + ' bytes.');
+    Session.set('gallery-urls', []);
+    Images.find().forEach(function(doc) {
+      var id = doc._id;
+      Images.retrieveBlob(id, function(fileItem) {
+        var blob = fileItem.blob || fileItem.file;
+        var urls = Session.get('gallery-urls');
         urls.push(URL.createObjectURL(blob));
+        Session.set('gallery-urls', urls);
       });
-      Session.set('gallery-urls', urls);
     });
+
   },
 });
 
@@ -91,5 +86,5 @@ var loadBlobs = function(files) {
   for (var index = 0; index < numImages; index++) {
     blobs.push(files[index]);
   }
-  Session.set('blobs', blobs);
+  SessionBlobs = blobs;
 };
