@@ -82,28 +82,43 @@ var showThumbs = function(blobs) {
   $('#img-add').val('');
 };
 
+var render = function(blob, orientation) {
+  var fileReader = new FileReader();
+  fileReader.onload = function() {
+    var arrayBuffer = this.result;
+    var img = new MegaPixImage(blob);
+    img.render(canvas, { maxWidth: 300, maxHeight: 300, orientation: orientation });
+  };
+  fileReader.readAsArrayBuffer(blob);
+};
+
+var renderOriented = function(blob) {
+  var fileReader = new FileReader();
+  fileReader.onloadend = function() {
+    var binaryString = this.result;
+    var oFile = new BinaryFile(binaryString, 0, blob.size);
+    var exif = EXIF.readFromBinaryFile(oFile);
+    var orientation = 0;
+
+    // Some images don't have EXIF data, which is fine.
+    if (exif) {
+      orientation = exif.Orientation;
+      console.info('Orientation is', orientation);
+    }
+
+    render(blob, orientation);
+  };
+  fileReader.readAsBinaryString(blob);
+};
+
 var loadBlobs = function(files) {
   var blobs = [];
   var numImages = files.length;
   for (var index = 0; index < numImages; index++) {
     var blob = files[index];
     blobs.push(blob);
-
     if (index == 0) {
-
-      var fileReader = new FileReader();
-      fileReader.onload = function() {
-        var arrayBuffer = this.result;
-        var img = new MegaPixImage(blob);
-
-        var byteBuffer = new Uint8Array(arrayBuffer);
-        var exif = EXIF.readFromBinaryFile(byteBuffer);
-        console.info(exif);
-        // TODO extract orientation
-
-        img.render(canvas, { maxWidth: 300, maxHeight: 300, orientation: 6 });
-      };
-      fileReader.readAsArrayBuffer(blob);
+      renderOriented(blob);
     }
   }
   SessionBlobs = blobs;
