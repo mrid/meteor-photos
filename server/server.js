@@ -1,12 +1,6 @@
 Images = new Meteor.Collection("images");
 
 Meteor.methods({
-  upload: function(images) {
-    console.info('Received ' + images.length + ' images.');
-    images.forEach(function(image) {
-      Images.insert({img: image});
-    });
-  },
   clear: function() {
     Images.remove({});
   },
@@ -16,4 +10,15 @@ Meteor.methods({
     console.info(buffers);
     return buffers;
   }
+});
+
+Meteor.Router.add('/upload/:id', 'POST', function(id) { 
+
+  console.info('Uploading ', id, this.request.body);
+
+  Images.insert({id: id, date: Date.now()});
+
+  var fs = Npm.require('fs');
+  // fs.writeSync(
+
 });

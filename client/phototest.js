@@ -3,7 +3,7 @@ var $log = null;
 
 Session.setDefault('thumb-urls', []);
 Session.setDefault('gallery-urls', []);
-Session.setDefault('buffers', []);
+Session.setDefault('blobs', []);
 
 Template.dbview.rendered = function() {
   $log = $('#log');
@@ -21,12 +21,20 @@ Template.uploader.events({
   'change #select-image': function(inputEvt) {
     var files = inputEvt.srcElement.files;
     showThumbs(files);
-    loadBuffers(files);
+    loadBlobs(files);
   },
   'click #btn-send': function() {
-    Meteor.call('upload', Session.get('buffers'));
+    var blobs = Session.get('blobs');
+
+    // mona begin
+    var id = Meteor.uuid();
+    var url = document.location.origin + '/upload/' + id;
+    console.info(url, blobs);
+    $.post(url, blobs[0]);
+    // mona end
+
     Session.set('thumb-urls', []);
-    Session.set('buffers', []);
+    Session.set('blobs', []);
   }
 });
 
@@ -55,9 +63,7 @@ Template.dbview.events({
         return;
       }
       var urls = [];
-      result.forEach(function(buffer) {
-        console.info('ArrayBuffer has ' + buffer.byteLength + ' bytes.');
-        var blob = new Blob([buffer], {type: 'image/jpeg'});
+      result.forEach(function(blob) {
         console.info('Blob has ' + blob.size + ' bytes.');
         urls.push(URL.createObjectURL(blob));
       });
@@ -71,7 +77,6 @@ var showThumbs = function(blobs) {
   var numImages = blobs.length;
   for (var index = 0; index < numImages; index++) {
     var blob = blobs[index];
-    console.info('good:', blob);
     $log.append('Reading blob with ' + blob.size + ' bytes\n');
     urls.push(URL.createObjectURL(blob));
   }
@@ -80,18 +85,11 @@ var showThumbs = function(blobs) {
   $('#img-add').val('');
 };
 
-var loadBuffers = function(blobs) {
-  var buffers = [];
-  var numImages = blobs.length;
+var loadBlobs = function(files) {
+  var blobs = [];
+  var numImages = files.length;
   for (var index = 0; index < numImages; index++) {
-    var bufferReader = new FileReader();
-    bufferReader.onloadend = function(fileReaderEvt) {
-      buffers.push(fileReaderEvt.target.result);
-      if (buffers.length == numImages) {
-        var newval = Session.get('buffers').concat(buffers);
-        Session.set('buffers', newval);
-      }        
-    };
-    bufferReader.readAsArrayBuffer(blobs[index]);
+    blobs.push(files[index]);
   }
+  Session.set('blobs', blobs);
 };
