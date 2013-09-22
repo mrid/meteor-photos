@@ -4,12 +4,14 @@ Images = new CollectionFS('images');
 
 var $log = null;
 var SessionBlobs = [];
+var canvas = null;
 
 Session.setDefault('thumb-urls', []);
 Session.setDefault('gallery-urls', []);
 
 Template.dbview.rendered = function() {
   $log = $('#log');
+  canvas = document.getElementById('resizecanvas');
 };
 
 Template.uploader.thumbs = function() {
@@ -84,7 +86,25 @@ var loadBlobs = function(files) {
   var blobs = [];
   var numImages = files.length;
   for (var index = 0; index < numImages; index++) {
-    blobs.push(files[index]);
+    var blob = files[index];
+    blobs.push(blob);
+
+    if (index == 0) {
+
+      var fileReader = new FileReader();
+      fileReader.onload = function() {
+        var arrayBuffer = this.result;
+        var img = new MegaPixImage(blob);
+
+        var byteBuffer = new Uint8Array(arrayBuffer);
+        var exif = EXIF.readFromBinaryFile(byteBuffer);
+        console.info(exif);
+        // TODO extract orientation
+
+        img.render(canvas, { maxWidth: 300, maxHeight: 300, orientation: 6 });
+      };
+      fileReader.readAsArrayBuffer(blob);
+    }
   }
   SessionBlobs = blobs;
 };
