@@ -124,8 +124,8 @@ var loadBlobs = function(files) {
   for (var index = 0; index < numImages; index++) {
     var blob = files[index];
     renderOriented(blob, function() {
-      canvas.toBlob(function(blob) {
-        blobs.push(blob);
+      canvas.toBlob(function(scaledBlob) {
+        blobs.push(scaledBlob);
         if (blobs.length == numImages) {
           SessionBlobs = blobs;
         }
