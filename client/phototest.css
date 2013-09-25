@@ -4,6 +4,10 @@
     color: rgb(24, 33, 61);
 }
 
+#resizecanvas {
+	display: none;
+}
+
 .dbview, .uploader, .status {
     color: #eee;
     background: rgb(24, 33, 61);

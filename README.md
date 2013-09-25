@@ -1,3 +1,5 @@
+Todo: fix safari issues
+
 Build
 ---
     npm install -g meteorite

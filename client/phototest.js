@@ -84,17 +84,22 @@ var showThumbs = function(blobs) {
   $('#img-add').val('');
 };
 
-var render = function(blob, orientation) {
+var render = function(blob, orientation, callback) {
   var fileReader = new FileReader();
   fileReader.onload = function() {
     var arrayBuffer = this.result;
     var img = new MegaPixImage(blob);
-    img.render(canvas, { maxWidth: 300, maxHeight: 300, orientation: orientation });
+    img.onrender = callback;
+    img.render(canvas, {
+      maxWidth: 300,
+      maxHeight: 300,
+      orientation: orientation
+    });
   };
   fileReader.readAsArrayBuffer(blob);
 };
 
-var renderOriented = function(blob) {
+var renderOriented = function(blob, callback) {
   var fileReader = new FileReader();
   fileReader.onloadend = function() {
     var binaryString = this.result;
@@ -108,7 +113,7 @@ var renderOriented = function(blob) {
       console.info('Orientation is', orientation);
     }
 
-    render(blob, orientation);
+    render(blob, orientation, callback);
   };
   fileReader.readAsBinaryString(blob);
 };
@@ -118,10 +123,13 @@ var loadBlobs = function(files) {
   var numImages = files.length;
   for (var index = 0; index < numImages; index++) {
     var blob = files[index];
-    blobs.push(blob);
-    if (index == 0) {
-      renderOriented(blob);
-    }
+    renderOriented(blob, function() {
+      canvas.toBlob(function(blob) {
+        blobs.push(blob);
+        if (blobs.length == numImages) {
+          SessionBlobs = blobs;
+        }
+      }, 'image/jpeg');
+    });
   }
-  SessionBlobs = blobs;
 };
