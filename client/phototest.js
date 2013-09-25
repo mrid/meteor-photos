@@ -2,6 +2,8 @@ Meteor.userId = function() { return 'dummy'; };
 
 Images = new CollectionFS('images');
 
+URLGEN = (typeof URL != 'undefined') ? URL : webkitURL;
+
 var $log = null;
 var SessionBlobs = [];
 var canvas = null;
@@ -61,7 +63,7 @@ Template.dbview.events({
       Images.retrieveBlob(id, function(fileItem) {
         var blob = fileItem.blob || fileItem.file;
         var urls = Session.get('gallery-urls');
-        urls.push(URL.createObjectURL(blob));
+        urls.push(URLGEN.createObjectURL(blob));
         Session.set('gallery-urls', urls);
       });
     });
@@ -75,7 +77,7 @@ var showThumbs = function(blobs) {
   for (var index = 0; index < numImages; index++) {
     var blob = blobs[index];
     $log.append('Reading blob with ' + blob.size + ' bytes\n');
-    urls.push(URL.createObjectURL(blob));
+    urls.push(URLGEN.createObjectURL(blob));
   }
   var newval = Session.get('thumb-urls').concat(urls);
   Session.set('thumb-urls', newval);
