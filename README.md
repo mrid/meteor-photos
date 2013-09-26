@@ -1,10 +1,20 @@
-Todo: fix safari issues
-
 Build
 ---
     npm install -g meteorite
     mrt install
     meteor
+
+Outside Fixes for Safari
+---
+`collectionFS_client.api.js` in `unionChunkBlobs`:
+
+    var buffers = fileItem.queueChunks.map(function(f) { return f.buffer; } );
+    self.queue[fileId].blob = new Blob(buffers, { type: fileItem.contentType });
+
+`canvas-toBlob.js` add `.buffer` on a couple lines near the end:
+
+    blob = new Blob([decode_base64(data).buffer], {type: type});
+	blob = new Blob([decodeURIComponent(data).buffer], {type: type});
 
 Libraries
 ---

@@ -96,9 +96,9 @@ if (HTMLCanvasElement && !HTMLCanvasElement.prototype.toBlob) {
 			blob.size = data.length;
 		} else if (Uint8Array) {
 			if (is_base64) {
-				blob = new Blob([decode_base64(data)], {type: type});
+				blob = new Blob([decode_base64(data).buffer], {type: type});
 			} else {
-				blob = new Blob([decodeURIComponent(data)], {type: type});
+				blob = new Blob([decodeURIComponent(data).buffer], {type: type});
 			}
 		}
 		callback(blob);
