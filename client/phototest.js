@@ -62,6 +62,10 @@ Template.dbview.events({
       var id = doc._id;
       Images.retrieveBlob(id, function(fileItem) {
         var blob = fileItem.blob || fileItem.file;
+        if (blob.size < 32) {
+          console.info('Blob ' + id + ' (retrieved from CollectionFS) ' +
+                       'is too small.');
+        }
         var urls = Session.get('gallery-urls');
         urls.push(URLGEN.createObjectURL(blob));
         Session.set('gallery-urls', urls);
